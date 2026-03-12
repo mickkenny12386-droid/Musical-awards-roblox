@@ -3,251 +3,341 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Wicked Roblox Musical - Management</title>
+    <title>Wicked | Official Roblox Production</title>
+    
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
+    
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;700&display=swap" rel="stylesheet">
+
     <style>
         :root {
             --wicked-green: #97d72e;
-            --dark-bg: #111;
-            --card-bg: #1a1a1a;
-            --text-white: #ffffff;
+            --emerald-glow: rgba(151, 215, 46, 0.3);
+            --dark-panel: rgba(20, 20, 20, 0.95);
         }
 
         body {
             margin: 0;
-            font-family: 'Segoe UI', Arial, sans-serif;
-            background-color: #000;
-            color: var(--text-white);
-            overflow-x: hidden;
+            background: #000;
+            color: #fff;
+            font-family: 'Montserrat', sans-serif;
+            line-height: 1.6;
         }
 
         /* Navigatie */
         nav {
-            background-color: #000;
+            position: fixed;
+            top: 0; width: 100%;
+            background: rgba(0,0,0,0.9);
             display: flex;
-            justify-content: center;
-            padding: 20px 0;
-            gap: 30px;
-            text-transform: uppercase;
-            font-size: 0.8rem;
-            font-weight: bold;
+            justify-content: space-between;
+            padding: 20px 50px;
+            box-sizing: border-box;
+            z-index: 100;
             border-bottom: 1px solid #222;
         }
 
-        nav a { color: var(--wicked-green); text-decoration: none; cursor: pointer; }
+        .nav-links a {
+            color: #fff;
+            text-decoration: none;
+            margin-left: 25px;
+            font-size: 12px;
+            letter-spacing: 2px;
+            transition: 0.3s;
+        }
 
-        /* Dynamische Banner */
-        .header-banner {
-            height: 350px;
+        .nav-links a:hover { color: var(--wicked-green); }
+
+        /* Hero Sectie */
+        .hero {
+            height: 60vh;
             background-size: cover;
             background-position: center;
             display: flex;
-            flex-direction: column;
             align-items: center;
             justify-content: center;
             text-align: center;
-            transition: background 0.5s ease;
-            box-shadow: inset 0 0 100px #000;
+            position: relative;
         }
 
-        .logo { font-size: 4rem; font-family: serif; letter-spacing: 8px; text-shadow: 2px 2px 10px #000; }
+        .hero::after {
+            content: '';
+            position: absolute;
+            bottom: 0; width: 100%; height: 100%;
+            background: linear-gradient(to bottom, transparent, #000);
+        }
 
-        /* Container */
-        .container {
-            max-width: 1100px;
-            margin: 40px auto;
+        .hero h1 {
+            font-size: 4rem;
+            letter-spacing: 12px;
+            z-index: 2;
+            text-shadow: 0 0 20px rgba(0,0,0,0.8);
+        }
+
+        /* Main Content */
+        .grid {
+            max-width: 1200px;
+            margin: -40px auto 50px;
             display: grid;
-            grid-template-columns: 280px 1fr;
+            grid-template-columns: 320px 1fr;
             gap: 30px;
             padding: 0 20px;
+            position: relative;
+            z-index: 5;
         }
 
-        .sidebar-card {
-            background-color: var(--card-bg);
-            padding: 25px;
-            margin-bottom: 20px;
-            text-align: center;
+        .card {
+            background: var(--dark-panel);
             border: 1px solid #333;
-        }
-
-        .btn {
-            background-color: var(--wicked-green);
-            color: #000;
-            padding: 12px;
-            text-decoration: none;
-            display: block;
-            font-weight: bold;
-            margin-top: 15px;
-            border: none;
-            cursor: pointer;
+            border-radius: 12px;
+            padding: 25px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
         }
 
         /* Kalender */
-        .calendar-container { background-color: var(--card-bg); border: 1px solid #333; }
-        .calendar-header { padding: 20px; text-align: center; font-size: 1.2rem; font-weight: bold; border-bottom: 1px solid #333; }
-        .calendar-grid { display: grid; grid-template-columns: repeat(7, 1fr); }
-        .day-label { padding: 10px; font-size: 0.7rem; background: #222; border: 0.5px solid #333; text-align: center; }
-        .calendar-day { min-height: 100px; border: 0.5px solid #333; padding: 5px; position: relative; }
-        .date-num { display: block; text-align: right; color: #555; margin-bottom: 5px; }
-        .show-tag { 
-            background: rgba(151, 215, 46, 0.2); 
-            color: var(--wicked-green); 
-            font-size: 0.75rem; 
-            padding: 2px 5px; 
-            margin-bottom: 2px;
-            border-radius: 3px;
-            text-align: center;
+        .calendar {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            border: 1px solid #222;
+        }
+
+        .day {
+            min-height: 100px;
+            border: 1px solid #222;
+            padding: 10px;
+            transition: 0.3s;
+        }
+
+        .day:hover { background: rgba(151, 215, 46, 0.05); }
+
+        .date-label { font-size: 11px; color: #666; display: block; text-align: right; }
+
+        .btn-ticket {
+            background: var(--wicked-green);
+            color: #000;
+            border: none;
+            width: 100%;
+            padding: 8px;
+            border-radius: 4px;
+            font-weight: bold;
+            font-size: 10px;
+            cursor: pointer;
+            margin-top: 10px;
+        }
+
+        /* Auth Form */
+        #auth-box {
+            position: fixed;
+            top: 50%; left: 50%;
+            transform: translate(-50%, -50%);
+            background: #111;
+            padding: 40px;
+            border-radius: 15px;
+            border: 2px solid var(--wicked-green);
+            display: none;
+            z-index: 1000;
+        }
+
+        input {
+            width: 100%;
+            padding: 12px;
+            margin: 10px 0;
+            background: #222;
+            border: 1px solid #444;
+            color: white;
+            box-sizing: border-box;
+        }
+
+        .ticket-item {
+            background: rgba(151, 215, 46, 0.1);
+            border-left: 3px solid var(--wicked-green);
+            padding: 10px;
+            margin-bottom: 10px;
+            font-size: 12px;
         }
 
         /* Admin Paneel Overlay */
         #admin-panel {
             display: none;
             position: fixed;
-            top: 10%; left: 50%;
-            transform: translateX(-50%);
-            width: 400px;
-            background: #222;
-            padding: 30px;
-            border: 2px solid var(--wicked-green);
-            z-index: 1000;
-            box-shadow: 0 0 50px rgba(0,0,0,0.9);
+            background: rgba(0,0,0,0.95);
+            top: 0; left: 0; width: 100%; height: 100%;
+            z-index: 2000;
+            padding: 50px;
+            box-sizing: border-box;
         }
-
-        input, select {
-            width: 100%;
-            padding: 10px;
-            margin: 10px 0;
-            background: #333;
-            border: 1px solid #444;
-            color: white;
-        }
-
-        .close-btn { color: red; cursor: pointer; float: right; }
     </style>
 </head>
 <body>
 
     <nav>
-        <a onclick="location.reload()">TICKETS</a>
-        <a onclick="alert('Binnenkort beschikbaar!')">DE SHOW</a>
-        <a onclick="showLogin()">BEHEER PANEEL</a>
+        <div style="font-weight: bold; letter-spacing: 2px;">WICKED <span style="color: var(--wicked-green);">ROBLOX</span></div>
+        <div class="nav-links">
+            <a href="#" onclick="location.reload()">HOME</a>
+            <a href="#" id="auth-btn" onclick="toggleAuthBox()">INLOGGEN</a>
+            <a href="#" id="admin-btn" style="display:none; color: gold;" onclick="toggleAdminPanel()">ADMIN PANEEL</a>
+        </div>
     </nav>
 
-    <div class="header-banner" id="mainBanner" style="background-image: url('https://www.wickedthemusical.co.uk/wp-content/uploads/2023/10/Wicked_Header_Green_Texture.jpg');">
-        <div class="logo">WICKED</div>
-        <h2 id="bannerTitle">ROBLOX MUSICAL EDITION</h2>
-    </div>
+    <section class="hero" id="hero-img" style="background-image: url('https://www.wickedthemusical.co.uk/wp-content/uploads/2023/10/Wicked_Header_Green_Texture.jpg');">
+        <h1>THE EMERALD CITY</h1>
+    </section>
 
-    <div class="container">
+    <div class="grid">
         <aside>
-            <div class="sidebar-card">
-                <h3 style="color: var(--wicked-green)">FRONT ROW</h3>
-                <p>Zit op de eerste rij in de Roblox studio!</p>
-                <button class="btn" onclick="alert('Ticketsysteem opent binnenkort')">KOOP TICKETS</button>
+            <div class="card">
+                <h3 id="user-welcome">Welkom, gast!</h3>
+                <p style="font-size: 11px; color: #888;">JOUW TICKETS:</p>
+                <div id="ticket-list">Log in om je tickets te zien.</div>
             </div>
-            <div class="sidebar-card">
-                <h3 style="color: var(--wicked-green)">CAST</h3>
-                <p id="castDisplay">Nog geen cast ingesteld.</p>
+            <br>
+            <div class="card">
+                <h3 style="color: var(--wicked-green)">HUIDIGE CAST</h3>
+                <p id="cast-display" style="font-size: 13px;">Laden...</p>
             </div>
         </aside>
 
-        <main class="calendar-container">
-            <div class="calendar-header">MAART 2026</div>
-            <div class="calendar-grid" id="calendarGrid">
+        <main class="card">
+            <h3>SPEELSCHEMA MAART 2026</h3>
+            <div class="calendar" id="calendar-grid">
                 </div>
         </main>
     </div>
 
+    <div id="auth-box">
+        <h2 id="auth-title">Inloggen</h2>
+        <input type="email" id="email" placeholder="E-mail">
+        <input type="password" id="password" placeholder="Wachtwoord">
+        <button class="btn-ticket" onclick="handleAuth()" style="font-size: 14px;">BEVESTIGEN</button>
+        <p onclick="switchAuth()" style="cursor:pointer; font-size: 12px; text-align: center; margin-top: 15px;">Account aanmaken?</p>
+    </div>
+
     <div id="admin-panel">
-        <span class="close-btn" onclick="closeAdmin()">X</span>
-        <h3>Beheerpaneel</h3>
-        
-        <label>Achtergrond Foto URL:</label>
-        <input type="text" id="bgInput" placeholder="https://afbeelding-url.jpg">
-        
-        <label>Show Toevoegen (Dag nummer):</label>
-        <input type="number" id="dayInput" min="1" max="31">
-        
-        <label>Tijd:</label>
-        <input type="text" id="timeInput" placeholder="Bijv. 19:30">
-
-        <label>Cast Lijst:</label>
-        <input type="text" id="castInput" placeholder="Naam1, Naam2...">
-
-        <button class="btn" onclick="saveSettings()">OPSLAAN & BIJWERKEN</button>
+        <button onclick="toggleAdminPanel()" style="background: red; color: white; border: none; padding: 10px; cursor: pointer;">SLUITEN</button>
+        <h2>Admin Dashboard</h2>
+        <div style="max-width: 500px;">
+            <label>Achtergrond URL:</label>
+            <input type="text" id="admin-bg" placeholder="URL naar foto">
+            <label>Cast Lijst:</label>
+            <textarea id="admin-cast" style="width:100%; height:100px; background:#222; color:white; border:1px solid #444; padding:10px;"></textarea>
+            <button class="btn-ticket" onclick="saveAdminSettings()" style="font-size: 16px; margin-top: 20px;">UPDATE SITE VOOR IEDEREEN</button>
+        </div>
     </div>
 
     <script>
-        const correctPassword = "Virtual2025!";
-        let shows = JSON.parse(localStorage.getItem('wicked_shows')) || [];
-        let customBg = localStorage.getItem('wicked_bg') || 'https://www.wickedthemusical.co.uk/wp-content/uploads/2023/10/Wicked_Header_Green_Texture.jpg';
-        let customCast = localStorage.getItem('wicked_cast') || 'Nog geen cast ingesteld.';
+        // --- JOUW FIREBASE CONFIG ---
+        const firebaseConfig = {
+            apiKey: "AIzaSyC6NE5hOdVdRc1JJuxe5jbyT7LLaXJi84o",
+            authDomain: "wickeddemusical.firebaseapp.com",
+            projectId: "wickeddemusical",
+            storageBucket: "wickeddemusical.firebasestorage.app",
+            messagingSenderId: "81908034436",
+            appId: "1:81908034436:web:1d56709ad83e7492e4cbd1"
+        };
 
-        function init() {
-            document.getElementById('mainBanner').style.backgroundImage = `url('${customBg}')`;
-            document.getElementById('castDisplay').innerText = customCast;
-            renderCalendar();
+        firebase.initializeApp(firebaseConfig);
+        const auth = firebase.auth();
+        const db = firebase.firestore();
+
+        let isLogin = true;
+
+        // --- AUTH LOGICA ---
+        function toggleAuthBox() { document.getElementById('auth-box').style.display = 'block'; }
+        function switchAuth() { 
+            isLogin = !isLogin; 
+            document.getElementById('auth-title').innerText = isLogin ? "Inloggen" : "Registreren";
         }
 
-        function showLogin() {
-            let pass = prompt("Voer het wachtwoord in voor beheer:");
-            if (pass === correctPassword) {
-                document.getElementById('admin-panel').style.display = 'block';
-                document.getElementById('bgInput').value = customBg;
-                document.getElementById('castInput').value = customCast;
-            } else {
-                alert("Fout wachtwoord!");
-            }
+        async function handleAuth() {
+            const e = document.getElementById('email').value;
+            const p = document.getElementById('password').value;
+            try {
+                if(isLogin) {
+                    await auth.signInWithEmailAndPassword(e, p);
+                } else {
+                    const res = await auth.createUserWithEmailAndPassword(e, p);
+                    await db.collection('users').doc(res.user.uid).set({ email: e, tickets: [], role: 'user' });
+                }
+                location.reload();
+            } catch(err) { alert(err.message); }
         }
 
-        function closeAdmin() {
-            document.getElementById('admin-panel').style.display = 'none';
-        }
-
-        function saveSettings() {
-            const newBg = document.getElementById('bgInput').value;
-            const day = document.getElementById('dayInput').value;
-            const time = document.getElementById('timeInput').value;
-            const cast = document.getElementById('castInput').value;
-
-            if(newBg) localStorage.setItem('wicked_bg', newBg);
-            if(cast) localStorage.setItem('wicked_cast', cast);
+        // --- TICKETS KOPEN ---
+        async function claimTicket(date) {
+            const user = auth.currentUser;
+            if(!user) return toggleAuthBox();
             
-            if(day && time) {
-                shows.push({day: parseInt(day), time: time});
-                localStorage.setItem('wicked_shows', JSON.stringify(shows));
-            }
+            await db.collection('users').doc(user.uid).update({
+                tickets: firebase.firestore.FieldValue.arrayUnion({ date: date, show: "Wicked Roblox" })
+            });
+            alert("Ticket toegevoegd aan je account!");
+            location.reload();
+        }
 
-            alert("Instellingen opgeslagen!");
+        // --- DATA LADEN ---
+        auth.onAuthStateChanged(async user => {
+            if(user) {
+                document.getElementById('auth-btn').innerText = "UITLOGGEN";
+                document.getElementById('auth-btn').onclick = () => auth.signOut().then(() => location.reload());
+                
+                const userDoc = await db.collection('users').doc(user.uid).get();
+                const userData = userDoc.data();
+                
+                document.getElementById('user-welcome').innerText = `Hallo, ${userData.email.split('@')[0]}!`;
+                
+                // Admin check
+                if(p === "Virtual2025!" || userData.role === 'admin') { 
+                    document.getElementById('admin-btn').style.display = 'inline';
+                }
+
+                // Tickets tonen
+                const tList = document.getElementById('ticket-list');
+                tList.innerHTML = userData.tickets.length ? '' : 'Geen tickets.';
+                userData.tickets.forEach(t => {
+                    tList.innerHTML += `<div class="ticket-item">🎟️ ${t.show} - ${t.date}</div>`;
+                });
+            }
+            loadGlobalSettings();
+            renderCalendar();
+        });
+
+        async function loadGlobalSettings() {
+            const snap = await db.collection('settings').doc('global').get();
+            if(snap.exists) {
+                const data = snap.data();
+                document.getElementById('cast-display').innerText = data.cast;
+                document.getElementById('hero-img').style.backgroundImage = `url('${data.bg}')`;
+            }
+        }
+
+        // --- ADMIN FUNCTIES ---
+        function toggleAdminPanel() {
+            const panel = document.getElementById('admin-panel');
+            panel.style.display = panel.style.display === 'block' ? 'none' : 'block';
+        }
+
+        async function saveAdminSettings() {
+            const bg = document.getElementById('admin-bg').value;
+            const cast = document.getElementById('admin-cast').value;
+            await db.collection('settings').doc('global').set({ bg, cast });
+            alert("Systeem bijgewerkt voor alle gebruikers!");
             location.reload();
         }
 
         function renderCalendar() {
-            const grid = document.getElementById('calendarGrid');
-            const labels = ['MA', 'DI', 'WO', 'DO', 'VR', 'ZA', 'ZO'];
-            
+            const grid = document.getElementById('calendar-grid');
             grid.innerHTML = '';
-            labels.forEach(l => grid.innerHTML += `<div class="day-label">${l}</div>`);
-
-            // Maart 2026 begint op een zondag (dag 7 in ons grid)
-            for(let i=1; i<7; i++) grid.innerHTML += `<div class="calendar-day"></div>`;
-
-            for(let d=1; d<=31; d++) {
-                let showHtml = '';
-                const dayShows = shows.filter(s => s.day === d);
-                dayShows.forEach(s => {
-                    showHtml += `<div class="show-tag">${s.time}</div>`;
-                });
-
+            for(let i=1; i<=31; i++) {
                 grid.innerHTML += `
-                    <div class="calendar-day">
-                        <span class="date-num">${d}</span>
-                        ${showHtml}
+                    <div class="day">
+                        <span class="date-label">${i} MRT</span>
+                        <button class="btn-ticket" onclick="claimTicket('${i} Maart')">GRATIS TICKET</button>
                     </div>
                 `;
             }
         }
-
-        init();
     </script>
 </body>
 </html>
