@@ -1,147 +1,121 @@
 <!DOCTYPE html>
-<html lang="nl">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Wicked Official | London</title>
+    <title>Wicked Official | Netherlands</title>
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@700&family=Montserrat:wght@300;400;600&display=swap" rel="stylesheet">
     
     <style>
-        :root { --emerald: #97d72e; --witch-black: #0a0a0a; --glass: rgba(20, 20, 20, 0.95); }
-        body { margin: 0; background: var(--witch-black); color: white; font-family: 'Montserrat', sans-serif; overflow-x: hidden; }
+        :root { --emerald: #97d72e; --witch-black: #0a0a0a; --glass: rgba(0, 0, 0, 0.85); }
         
-        /* Navigatie */
-        nav { background: black; padding: 15px 50px; display: flex; flex-direction: column; align-items: center; border-bottom: 1px solid #333; position: sticky; top: 0; z-index: 1000; }
-        .nav-logo { font-family: 'Cinzel', serif; font-size: 32px; letter-spacing: 5px; margin-bottom: 10px; cursor: pointer; }
-        .nav-links { display: flex; gap: 30px; }
-        .nav-links a { color: var(--emerald); text-decoration: none; font-weight: 600; font-size: 13px; text-transform: uppercase; cursor: pointer; transition: 0.3s; }
-        .nav-links a:hover { color: white; }
+        body { 
+            margin: 0; 
+            background: url('https://i.ibb.co/v4mYmYm/image-41147e.jpg') no-repeat center center fixed; 
+            background-size: cover;
+            color: white; 
+            font-family: 'Montserrat', sans-serif; 
+        }
 
-        /* Hero */
-        .hero-banner { height: 250px; background: linear-gradient(rgba(0,0,0,0.5), var(--witch-black)), url('https://www.wickedthemusical.co.uk/wp-content/uploads/2023/10/Wicked_Header_Green_Texture.jpg'); background-size: cover; background-position: center; display: flex; flex-direction: column; align-items: center; justify-content: center; }
-        .hero-banner h1 { font-family: 'Cinzel', serif; font-size: 2.5rem; letter-spacing: 3px; margin: 0; }
+        /* Overlay to make text readable */
+        .bg-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); z-index: -1; }
+        
+        nav { background: rgba(0,0,0,0.9); padding: 15px 50px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--emerald); position: sticky; top: 0; z-index: 1000; }
+        .nav-links { display: flex; gap: 20px; align-items: center; }
+        .nav-links a { color: var(--emerald); text-decoration: none; font-weight: 600; font-size: 13px; text-transform: uppercase; cursor: pointer; }
 
-        /* Content Secties */
-        .container { max-width: 1200px; margin: 40px auto; padding: 0 20px; }
-        .section-box { display: none; background: var(--glass); border: 1px solid #333; padding: 40px; border-radius: 5px; }
+        .container { max-width: 1000px; margin: 40px auto; padding: 20px; z-index: 1; position: relative; }
+        .section-box { background: var(--glass); border: 1px solid var(--emerald); padding: 40px; border-radius: 15px; display: none; }
         .section-box.active { display: block; }
 
-        /* Kalender & Rangen */
+        /* Calendar & Booking */
         .calendar-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 10px; margin-top: 20px; }
-        .day { border: 1px solid #444; padding: 15px; text-align: center; min-height: 80px; position: relative; }
-        .day.has-show { border-color: var(--emerald); cursor: pointer; }
-        .rang-selector { display: flex; gap: 20px; justify-content: center; margin-top: 30px; }
-        .rang-card { background: #1a1a1a; padding: 20px; border: 1px solid var(--emerald); width: 150px; text-align: center; cursor: pointer; transition: 0.3s; }
-        .rang-card:hover { transform: translateY(-5px); background: var(--emerald); color: black; }
+        .day { background: rgba(255,255,255,0.05); border: 1px solid #444; padding: 15px; text-align: center; min-height: 60px; border-radius: 8px; }
+        .day.has-show { border-color: var(--emerald); cursor: pointer; background: rgba(151, 215, 46, 0.1); }
+        .day.sold-out { border-color: #ff4444; cursor: not-allowed; opacity: 0.5; }
 
-        /* Formulieren */
-        input, textarea, select { width: 100%; padding: 12px; margin: 10px 0; background: #111; border: 1px solid #444; color: white; border-radius: 4px; box-sizing: border-box; }
-        .btn { background: var(--emerald); color: black; padding: 15px 30px; border: none; font-weight: bold; cursor: pointer; text-transform: uppercase; width: 100%; }
+        .rang-card { background: #111; padding: 20px; border: 1px solid #333; margin: 10px 0; border-radius: 10px; display: flex; justify-content: space-between; align-items: center; }
+        .ticket-controls { display: flex; align-items: center; gap: 15px; }
+        .qty-btn { background: var(--emerald); border: none; width: 30px; height: 30px; font-weight: bold; cursor: pointer; }
 
-        /* Admin Styles */
-        #admin-panel { background: #000; border: 2px solid gold; padding: 20px; margin-top: 20px; display: none; }
-        .admin-tab { border-bottom: 1px solid #333; margin-bottom: 20px; padding-bottom: 10px; }
+        input, textarea, select { width: 100%; padding: 12px; margin: 10px 0; background: #222; border: 1px solid #444; color: white; }
+        .btn { background: var(--emerald); color: black; padding: 15px; border: none; font-weight: bold; cursor: pointer; width: 100%; border-radius: 5px; }
+        .login-btn { border: 1px solid var(--emerald); background: transparent; color: var(--emerald); padding: 8px 15px; cursor: pointer; }
     </style>
 </head>
 <body>
+    <div class="bg-overlay"></div>
 
     <nav>
-        <div class="nav-logo" onclick="showSection('theshow')">WICKED</div>
+        <div style="font-family: 'Cinzel'; font-size: 24px; letter-spacing: 3px;">WICKED <span style="font-size: 12px; color: var(--emerald);">NETHERLANDS</span></div>
         <div class="nav-links">
             <a onclick="showSection('theshow')">The Show</a>
-            <a onclick="showSection('yourvisit')">Your Visit</a>
-            <a onclick="showSection('audities')">Audities</a>
+            <a onclick="showSection('audities')">Auditions</a>
             <a onclick="showSection('newsletter')">Newsletter</a>
-            <a id="admin-nav" style="display:none; color:gold;" onclick="showSection('admin')">Admin Panel</a>
+            <button class="login-btn" id="login-nav" onclick="toggleAuth()">LOG IN</button>
+            <a id="admin-nav" style="display:none; color:gold;" onclick="showSection('admin')">Admin</a>
         </div>
     </nav>
 
-    <div class="hero-banner">
-        <h1 id="hero-title">THE SHOW</h1>
-        <p id="hero-subtitle">Official Wicked London Tickets</p>
-    </div>
-
     <div class="container">
-        
         <section id="theshow" class="section-box active">
-            <h2 id="current-month">MARCH 2026</h2>
+            <h2>Performance Schedule - March 2026</h2>
             <div class="calendar-grid" id="calendar"></div>
             
-            <div id="booking-step" style="display:none; margin-top:40px; text-align:center; border-top:1px solid #333; padding-top:20px;">
-                <h3>Selecteer je Rang</h3>
-                <div class="rang-selector">
-                    <div class="rang-card" onclick="selectRang(1)"><h4>Rang 1</h4><p>€85.00</p></div>
-                    <div class="rang-card" onclick="selectRang(2)"><h4>Rang 2</h4><p>€65.00</p></div>
-                    <div class="rang-card" onclick="selectRang(3)"><h4>Rang 3</h4><p>€45.00</p></div>
+            <div id="booking-step" style="display:none; margin-top:30px;">
+                <h3 id="show-details">Booking for March 14th</h3>
+                <div class="rang-card">
+                    <span>Rank 1 (Front) - FREE</span>
+                    <div class="ticket-controls">
+                        <button class="qty-btn" onclick="updateQty('r1', -1)">-</button>
+                        <span id="q-r1">0</span>
+                        <button class="qty-btn" onclick="updateQty('r1', 1)">+</button>
+                    </div>
                 </div>
+                <div class="rang-card">
+                    <span>Rank 2 (Middle) - FREE</span>
+                    <div class="ticket-controls">
+                        <button class="qty-btn" onclick="updateQty('r2', -1)">-</button>
+                        <span id="q-r2">0</span>
+                        <button class="qty-btn" onclick="updateQty('r2', 1)">+</button>
+                    </div>
+                </div>
+                <div class="rang-card">
+                    <span>Rank 3 (Back) - FREE</span>
+                    <div class="ticket-controls">
+                        <button class="qty-btn" onclick="updateQty('r3', -1)">-</button>
+                        <span id="q-r3">0</span>
+                        <button class="qty-btn" onclick="updateQty('r3', 1)">+</button>
+                    </div>
+                </div>
+                <button class="btn" onclick="submitBooking()">SUBMIT BOOKING</button>
             </div>
-        </section>
-
-        <section id="yourvisit" class="section-box">
-            <h2>Jouw Tickets</h2>
-            <div id="my-tickets">Log in om je tickets te bekijken.</div>
         </section>
 
         <section id="audities" class="section-box">
-            <h2>Audition Form</h2>
-            <div id="audition-form-container">
-                <label>Full Name</label>
-                <input type="text" id="aud-name" placeholder="Whats your name.">
-                
-                <label>Age</label>
-                <input type="number" id="aud-age" placeholder="How old are you?">
-                
-                <label>Discord Username</label>
-                <input type="text" id="aud-discord" placeholder="Whats your discord name.">
-                
-                <label>Experience</label>
-                <textarea id="aud-exp" rows="4" placeholder="Whats your experience."></textarea>
-                
-                <label>Availability</label>
-                <select id="aud-avail">
-                    <option value="yes">Yes, I can attend every rehearsal</option>
-                    <option value="no">No, I have some restrictions</option>
-                </select>
-                
-                <button class="btn" onclick="submitAudition()">SUBMIT AUDITION</button>
-            </div>
+            <h2>Audition for Wicked Netherlands</h2>
+            <input type="text" id="aud-name" placeholder="What's your name?">
+            <input type="number" id="aud-age" placeholder="How old are you?">
+            <input type="text" id="aud-discord" placeholder="What's your Discord name?">
+            <textarea id="aud-exp" placeholder="What's your experience?"></textarea>
+            <select id="aud-avail">
+                <option value="yes">I can attend every rehearsal</option>
+                <option value="no">I have some limitations</option>
+            </select>
+            <button class="btn" onclick="submitAudition()">SUBMIT AUDITION</button>
         </section>
 
         <section id="newsletter" class="section-box">
-            <h2>Laatste Nieuws</h2>
-            <div id="news-feed">Geen nieuws beschikbaar.</div>
+            <h2>Latest News</h2>
+            <div id="news-feed">Loading the latest magic...</div>
         </section>
-
-        <section id="admin" class="section-box" style="border-color: gold;">
-            <h2 style="color:gold;">WITCH MASTER PANEL</h2>
-            
-            <div class="admin-tab">
-                <h3>Show Toevoegen</h3>
-                <input type="number" id="adm-day" placeholder="Dag (bijv. 14)">
-                <input type="text" id="adm-time" placeholder="Tijd (bijv. 19:30)">
-                <button class="btn" style="background:white;" onclick="addShow()">VOEG SHOW TOE</button>
-            </div>
-
-            <div class="admin-tab">
-                <h3>Newsletter Plaatsen</h3>
-                <input type="text" id="news-title" placeholder="Titel van bericht">
-                <textarea id="news-content" placeholder="Inhoud van het nieuwsbericht..."></textarea>
-                <button class="btn" style="background:white;" onclick="postNews()">PLAATS NIEUWS</button>
-            </div>
-
-            <div class="admin-tab">
-                <h3>Ingekomen Audities</h3>
-                <div id="admin-auditions-list">Laden...</div>
-            </div>
-        </section>
-
     </div>
 
     <script>
-        // FIREBASE CONFIG
+        // Use your existing Firebase Config here
         const firebaseConfig = {
             apiKey: "AIzaSyCCm6vZCE1KH1SnclU7NHF2BmeOUW_suio",
             authDomain: "wickedrobloxofficial.firebaseapp.com",
@@ -154,116 +128,69 @@
         const db = firebase.firestore();
         const auth = firebase.auth();
 
-        let currentActiveShow = null;
+        let selectedShowId = null;
+        let tickets = { r1: 0, r2: 0, r3: 0 };
 
-        // AUTH CHECK
-        auth.onAuthStateChanged(user => {
-            if(user && user.email === "virtual@gmail.com") {
-                document.getElementById('admin-nav').style.display = 'block';
-                loadAdminAuditions();
-            }
-            loadCalendar();
-            loadNews();
-        });
-
-        // NAVIGATIE LOGICA
         function showSection(id) {
             document.querySelectorAll('.section-box').forEach(s => s.classList.remove('active'));
             document.getElementById(id).classList.add('active');
-            document.getElementById('hero-title').innerText = id.toUpperCase().replace('THE', 'THE ');
         }
 
-        // SHOWS & KALENDER
         async function loadCalendar() {
             const cal = document.getElementById('calendar');
             cal.innerHTML = '';
             const snap = await db.collection('shows').get();
             const shows = {};
-            snap.forEach(doc => shows[doc.data().day] = doc.data());
+            snap.forEach(doc => shows[doc.data().day] = { id: doc.id, ...doc.data() });
 
             for(let i=1; i<=31; i++) {
+                const s = shows[i];
+                const isSoldOut = s && (s.sold >= (s.capacity || 50));
                 const dayDiv = document.createElement('div');
-                dayDiv.className = `day ${shows[i] ? 'has-show' : ''}`;
-                dayDiv.innerHTML = `<b>${i}</b><br>${shows[i] ? shows[i].time : ''}`;
-                if(shows[i]) dayDiv.onclick = () => {
-                    currentActiveShow = shows[i];
-                    document.getElementById('booking-step').style.display = 'block';
-                    window.scrollTo(0, document.body.scrollHeight);
-                };
+                dayDiv.className = `day ${s ? 'has-show' : ''} ${isSoldOut ? 'sold-out' : ''}`;
+                dayDiv.innerHTML = `<b>${i}</b><br>${s ? (isSoldOut ? 'SOLD OUT' : s.time) : ''}`;
+                
+                if(s && !isSoldOut) {
+                    dayDiv.onclick = () => {
+                        selectedShowId = s.id;
+                        document.getElementById('booking-step').style.display = 'block';
+                        document.getElementById('show-details').innerText = `Booking for March ${i}th (${s.time})`;
+                    };
+                }
                 cal.appendChild(dayDiv);
             }
         }
 
-        async function addShow() {
-            const day = document.getElementById('adm-day').value;
-            const time = document.getElementById('adm-time').value;
-            await db.collection('shows').add({ day: parseInt(day), time: time });
-            alert("Show toegevoegd!");
+        function updateQty(rang, val) {
+            tickets[rang] = Math.max(0, tickets[rang] + val);
+            document.getElementById(`q-${rang}`).innerText = tickets[rang];
+        }
+
+        async function submitBooking() {
+            if(!auth.currentUser) return alert("Please log in to book tickets.");
+            const total = tickets.r1 + tickets.r2 + tickets.r3;
+            if(total === 0) return alert("Please select at least one ticket.");
+
+            await db.collection('shows').doc(selectedShowId).update({
+                sold: firebase.firestore.FieldValue.increment(total)
+            });
+            
+            await db.collection('bookings').add({
+                userId: auth.currentUser.uid,
+                showId: selectedShowId,
+                tickets: tickets,
+                status: 'Confirmed'
+            });
+
+            alert("Tickets booked! See you in Oz (Netherlands)!");
+            location.reload();
+        }
+
+        // Initialize
+        auth.onAuthStateChanged(user => {
+            if(user) document.getElementById('login-nav').innerText = "LOG OUT";
             loadCalendar();
-        }
-
-        // AUDITIES
-        async function submitAudition() {
-            const data = {
-                name: document.getElementById('aud-name').value,
-                age: document.getElementById('aud-age').value,
-                discord: document.getElementById('aud-discord').value,
-                experience: document.getElementById('aud-exp').value,
-                availability: document.getElementById('aud-avail').value,
-                timestamp: firebase.firestore.FieldValue.serverTimestamp()
-            };
-            await db.collection('auditions').add(data);
-            alert("Audition submitted successfully! Good luck.");
-            showSection('theshow');
-        }
-
-        async function loadAdminAuditions() {
-            const list = document.getElementById('admin-auditions-list');
-            const snap = await db.collection('auditions').orderBy('timestamp', 'desc').get();
-            list.innerHTML = '';
-            snap.forEach(doc => {
-                const d = doc.data();
-                list.innerHTML += `
-                    <div style="background:#222; padding:10px; margin-bottom:10px; border-left:4px solid var(--emerald);">
-                        <b>${d.name} (${d.age})</b> - Discord: ${d.discord}<br>
-                        <i>Experience:</i> ${d.experience}<br>
-                        <i>Attend Rehearsals:</i> ${d.availability}
-                    </div>`;
-            });
-        }
-
-        // NEWSLETTER
-        async function postNews() {
-            const title = document.getElementById('news-title').value;
-            const content = document.getElementById('news-content').value;
-            await db.collection('news').add({
-                title: title,
-                content: content,
-                date: new Date().toLocaleDateString()
-            });
-            alert("Nieuws geplaatst!");
-            loadNews();
-        }
-
-        async function loadNews() {
-            const feed = document.getElementById('news-feed');
-            const snap = await db.collection('news').get();
-            feed.innerHTML = '';
-            snap.forEach(doc => {
-                const d = doc.data();
-                feed.innerHTML += `
-                    <div style="margin-bottom:30px; border-bottom:1px solid #222; padding-bottom:10px;">
-                        <h3 style="color:var(--emerald); margin-bottom:5px;">${d.title}</h3>
-                        <small>${d.date}</small>
-                        <p>${d.content}</p>
-                    </div>`;
-            });
-        }
-
-        function selectRang(num) {
-            alert("Je hebt Rang " + num + " geselecteerd voor de show. Betaling volgt in Oz!");
-        }
-
+        });
     </script>
 </body>
 </html>
