@@ -9,81 +9,162 @@
     <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@700&family=Montserrat:wght@300;400;600&display=swap" rel="stylesheet">
     
     <style>
-        :root { --emerald: #97d72e; --glass: rgba(0, 0, 0, 0.9); }
+        :root { 
+            --emerald: #97d72e; 
+            --dark-emerald: #1a3300;
+            --glass: rgba(10, 10, 10, 0.95);
+            --border: rgba(151, 215, 46, 0.4);
+        }
+
         body { 
             margin: 0; 
-            background: #000;
-            background-size: cover;
+            /* De gevraagde zwarte naar groene fade */
+            background: linear-gradient(0deg, #000000 0%, #050505 40%, var(--dark-emerald) 100%);
             background-attachment: fixed;
             color: white; 
             font-family: 'Montserrat', sans-serif; 
-            transition: background 0.5s ease;
+            min-height: 100vh;
         }
-        nav { background: rgba(0,0,0,0.95); padding: 15px 50px; display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid var(--emerald); position: sticky; top: 0; z-index: 1000; }
-        .nav-links { display: flex; gap: 20px; align-items: center; }
-        .nav-links a { color: var(--emerald); text-decoration: none; font-weight: 600; font-size: 13px; text-transform: uppercase; cursor: pointer; }
+
+        nav { 
+            background: rgba(0,0,0,0.9); 
+            padding: 20px 50px; 
+            display: flex; 
+            justify-content: space-between; 
+            align-items: center; 
+            border-bottom: 2px solid var(--emerald); 
+            position: sticky; 
+            top: 0; 
+            z-index: 1000; 
+        }
+
+        .nav-links a { color: var(--emerald); text-decoration: none; font-weight: 600; font-size: 13px; text-transform: uppercase; cursor: pointer; margin-left: 25px; transition: 0.3s; }
+        .nav-links a:hover { color: white; text-shadow: 0 0 10px var(--emerald); }
+
         .container { max-width: 1000px; margin: 40px auto; padding: 20px; }
-        .section-box { background: var(--glass); border: 1px solid var(--emerald); padding: 40px; border-radius: 15px; display: none; }
-        .section-box.active { display: block; }
-        .admin-card { background: #111; padding: 15px; margin-bottom: 10px; border-radius: 8px; border-left: 4px solid gold; }
-        .btn { background: var(--emerald); color: black; padding: 12px; border: none; font-weight: bold; cursor: pointer; border-radius: 5px; width: 100%; margin-top: 10px; }
-        .ticket-card { background: rgba(151, 215, 46, 0.1); border: 1px dashed var(--emerald); padding: 20px; margin-top: 10px; border-radius: 10px; }
+
+        /* Verbeterde Textboxes & Secties */
+        .section-box { 
+            background: var(--glass); 
+            border: 1px solid var(--border); 
+            padding: 40px; 
+            border-radius: 20px; 
+            display: none; 
+            box-shadow: 0 15px 35px rgba(0,0,0,0.8);
+        }
+        .section-box.active { display: block; animation: fadeIn 0.4s ease-out; }
+
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+        h2 { font-family: 'Cinzel'; color: var(--emerald); border-bottom: 1px solid var(--border); padding-bottom: 10px; margin-top: 0; }
+
+        input, textarea, select { 
+            width: 100%; 
+            padding: 15px; 
+            margin: 12px 0; 
+            background: rgba(255,255,255,0.05); 
+            border: 1px solid #333; 
+            color: white; 
+            border-radius: 8px; 
+            font-family: inherit;
+            transition: 0.3s;
+        }
+        input:focus, textarea:focus { border-color: var(--emerald); outline: none; background: rgba(151, 215, 46, 0.05); }
+
+        .btn { 
+            background: var(--emerald); 
+            color: black; 
+            padding: 15px 25px; 
+            border: none; 
+            font-weight: 800; 
+            cursor: pointer; 
+            border-radius: 8px; 
+            text-transform: uppercase; 
+            transition: 0.3s;
+            width: 100%;
+        }
+        .btn:hover { background: white; box-shadow: 0 0 20px var(--emerald); }
+
+        /* Admin UI Upgrade */
+        .admin-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+        .admin-card { background: #0a0a0a; border: 1px solid #222; padding: 20px; border-radius: 12px; margin-bottom: 20px; }
+        .admin-card h3 { color: gold; margin-top: 0; font-size: 14px; text-transform: uppercase; }
+
+        .calendar-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 10px; margin-top: 20px; }
+        .day { background: rgba(255,255,255,0.05); border: 1px solid #222; padding: 10px; text-align: center; border-radius: 5px; }
+        .day.has-show { border-color: var(--emerald); background: rgba(151, 215, 46, 0.15); cursor: pointer; }
+
+        .status-msg { padding: 20px; border-radius: 10px; text-align: center; font-weight: bold; border: 1px solid; margin-top: 20px; }
     </style>
 </head>
 <body id="main-body">
 
     <nav>
-        <div style="font-family: 'Cinzel'; font-size: 24px; letter-spacing: 3px;">WICKED <span style="color: var(--emerald);">NL</span></div>
+        <div style="font-family: 'Cinzel'; font-size: 26px; letter-spacing: 4px;">WICKED <span style="color: var(--emerald);">NL</span></div>
         <div class="nav-links">
             <a onclick="showSection('theshow')">The Show</a>
             <a onclick="showSection('yourvisit')">Your Visit</a>
             <a onclick="showSection('audities')">Auditions</a>
             <a onclick="showSection('newsletter')">Newsletter</a>
-            <a id="admin-nav" style="display:none; color:gold;" onclick="showSection('admin')">ADMIN</a>
-            <button class="btn" style="width:auto; padding: 5px 15px;" onclick="handleLogin()">LOG IN</button>
+            <a id="admin-nav" style="display:none; color:gold;" onclick="showSection('admin')">Admin Panel</a>
+            <a onclick="handleLoginAuth()">Log in</a>
         </div>
     </nav>
 
     <div class="container">
+        
         <section id="theshow" class="section-box active">
-            <h2>Select your Show</h2>
-            <div id="show-list">Loading shows...</div>
-        </section>
-
-        <section id="yourvisit" class="section-box">
-            <h2>Your Tickets</h2>
-            <div id="my-tickets-container">You haven't booked any tickets yet.</div>
+            <h2>Performance Dates</h2>
+            <div class="calendar-grid" id="calendar"></div>
         </section>
 
         <section id="audities" class="section-box">
-            <h2>Audition Panel</h2>
-            <div id="audition-ui">
+            <h2>Audition for Wicked</h2>
+            <div id="audition-form-ui">
                 <input type="text" id="aud-name" placeholder="Full Name">
-                <input type="text" id="aud-discord" placeholder="Discord Name">
-                <textarea id="aud-exp" placeholder="Experience"></textarea>
-                <button class="btn" onclick="submitAudition()">Submit Audition</button>
+                <input type="text" id="aud-discord" placeholder="Discord Username">
+                <textarea id="aud-exp" rows="4" placeholder="Experience & Motivation"></textarea>
+                <button class="btn" onclick="submitAudition()">Submit Registration</button>
             </div>
-            <div id="status-ui" style="display:none; text-align:center;">
-                <h3 id="status-text">Processing...</h3>
-                <p id="status-reason" style="color: #ff4444;"></p>
-                <button id="retry-btn" class="btn" style="display:none;" onclick="resetAudition()">I Understand & Retry</button>
-            </div>
+            <div id="audition-status-ui" style="display:none;"></div>
+        </section>
+
+        <section id="yourvisit" class="section-box">
+            <h2>Your Visit</h2>
+            <div id="tickets-list">Log in to see your confirmed bookings.</div>
+        </section>
+
+        <section id="newsletter" class="section-box">
+            <h2>Emerald City News</h2>
+            <div id="news-feed">Loading the latest magic...</div>
         </section>
 
         <section id="admin" class="section-box">
-            <h2 style="color:gold;">Witch Master Controls</h2>
+            <h2 style="color:gold;">Witch Master Control</h2>
             
-            <div class="admin-card">
-                <h3>Change Website Background</h3>
-                <input type="text" id="bg-url-input" placeholder="Paste image URL here">
-                <button class="btn" onclick="updateBackground()">Update Background</button>
+            <div class="admin-grid">
+                <div class="admin-card">
+                    <h3>Post Newsletter</h3>
+                    <input type="text" id="adm-news-title" placeholder="News Title">
+                    <textarea id="adm-news-text" placeholder="Content..."></textarea>
+                    <button class="btn" style="padding:10px;" onclick="postNewsletter()">Post News</button>
+                </div>
+                <div class="admin-card">
+                    <h3>Site Settings</h3>
+                    <input type="text" id="adm-bg-url" placeholder="New Background Image URL">
+                    <button class="btn" style="padding:10px; margin-bottom:15px;" onclick="changeBg()">Update Background</button>
+                    
+                    <h3>Add Show Date</h3>
+                    <input type="number" id="adm-day" placeholder="Day (e.g. 15)">
+                    <input type="text" id="adm-time" placeholder="Time (e.g. 19:30)">
+                    <button class="btn" style="padding:10px;" onclick="addShow()">Add to Calendar</button>
+                </div>
             </div>
 
-            <h3>Manage Auditions</h3>
-            <div id="admin-auditions"></div>
+            <h3 style="color:gold; margin-top:30px;">Pending Auditions</h3>
+            <div id="admin-audition-list"></div>
         </section>
 
-        <section id="newsletter" class="section-box"><h2>Newsletter</h2><div id="news-feed"></div></section>
     </div>
 
     <script>
@@ -98,107 +179,144 @@
         firebase.initializeApp(firebaseConfig);
         const db = firebase.firestore();
 
-        let userSession = localStorage.getItem('wicked_user');
+        let loggedIn = localStorage.getItem('wicked_admin') === 'true';
 
         function showSection(id) {
             document.querySelectorAll('.section-box').forEach(s => s.classList.remove('active'));
             document.getElementById(id).classList.add('active');
         }
 
-        // --- BACKGROUND SYSTEM ---
-        async function updateBackground() {
-            const url = document.getElementById('bg-url-input').value;
-            await db.collection('settings').doc('theme').set({ background: url });
-            alert("Background updated!");
+        // --- ADMIN FUNCTIONS ---
+        function handleLoginAuth() {
+            const user = prompt("Enter Username:");
+            if(user === "virtual2025") {
+                localStorage.setItem('wicked_admin', 'true');
+                location.reload();
+            }
         }
 
-        db.collection('settings').doc('theme').onSnapshot(doc => {
-            if(doc.exists()) document.getElementById('main-body').style.backgroundImage = `url('${doc.data().background}')`;
-        });
+        if(loggedIn) {
+            document.getElementById('admin-nav').style.display = 'block';
+            loadAdminAuditions();
+        }
+
+        async function postNewsletter() {
+            const title = document.getElementById('adm-news-title').value;
+            const text = document.getElementById('adm-news-text').value;
+            await db.collection('news').add({ title, text, date: new Date().toLocaleDateString() });
+            alert("Newsletter Posted!");
+        }
+
+        async function changeBg() {
+            const url = document.getElementById('adm-bg-url').value;
+            await db.collection('settings').doc('theme').set({ background: url });
+            alert("Background Updated!");
+        }
+
+        async function addShow() {
+            const day = document.getElementById('adm-day').value;
+            const time = document.getElementById('adm-time').value;
+            await db.collection('shows').add({ day: parseInt(day), time });
+            alert("Show Added!");
+            loadCalendar();
+        }
+
+        // --- CALENDAR & NEWS ---
+        async function loadCalendar() {
+            const cal = document.getElementById('calendar');
+            cal.innerHTML = '';
+            const snap = await db.collection('shows').get();
+            const shows = {};
+            snap.forEach(doc => shows[doc.data().day] = doc.data().time);
+            for(let i=1; i<=31; i++) {
+                cal.innerHTML += `<div class="day ${shows[i] ? 'has-show' : ''}"><b>${i}</b><br><small>${shows[i] || ''}</small></div>`;
+            }
+        }
+
+        async function loadNews() {
+            const feed = document.getElementById('news-feed');
+            const snap = await db.collection('news').get();
+            feed.innerHTML = '';
+            snap.forEach(doc => {
+                const d = doc.data();
+                feed.innerHTML += `<div class="admin-card"><small>${d.date}</small><h3>${d.title}</h3><p>${d.text}</p></div>`;
+            });
+        }
 
         // --- AUDITION SYSTEM ---
         async function submitAudition() {
             const name = document.getElementById('aud-name').value;
             const disc = document.getElementById('aud-discord').value;
             const exp = document.getElementById('aud-exp').value;
-            
-            const docRef = await db.collection('auditions').add({
-                name, discord: disc, exp, status: 'pending', reason: '', timestamp: Date.now()
-            });
-            localStorage.setItem('my_audition_id', docRef.id);
-            monitorStatus(docRef.id);
-        }
-
-        function monitorStatus(id) {
-            db.collection('auditions').doc(id).onSnapshot(doc => {
-                if(!doc.exists) {
-                    document.getElementById('audition-ui').style.display = 'block';
-                    document.getElementById('status-ui').style.display = 'none';
-                    return;
-                }
-                const data = doc.data();
-                document.getElementById('audition-ui').style.display = 'none';
-                document.getElementById('status-ui').style.display = 'block';
-                
-                if(data.status === 'pending') {
-                    document.getElementById('status-text').innerText = "Status: Please wait for results";
-                    document.getElementById('retry-btn').style.display = 'none';
-                } else if(data.status === 'rejected') {
-                    document.getElementById('status-text').innerText = "Status: Rejected";
-                    document.getElementById('status-reason').innerText = "Reason: " + data.reason;
-                    document.getElementById('retry-btn').style.display = 'block';
-                } else if(data.status === 'accepted') {
-                    document.getElementById('status-text').innerText = "Status: ACCEPTED! Check your Discord.";
-                    document.getElementById('status-text').style.color = "var(--emerald)";
-                }
-            });
-        }
-
-        async function resetAudition() {
-            const id = localStorage.getItem('my_audition_id');
-            await db.collection('auditions').doc(id).delete();
-            localStorage.removeItem('my_audition_id');
+            const doc = await db.collection('auditions').add({ name, discord: disc, exp, status: 'pending', reason: '' });
+            localStorage.setItem('my_aud_id', doc.id);
             location.reload();
         }
 
-        // --- ADMIN AUDITIONS ---
+        function checkAuditionStatus() {
+            const myId = localStorage.getItem('my_aud_id');
+            if(!myId) return;
+
+            db.collection('auditions').doc(myId).onSnapshot(doc => {
+                if(!doc.exists()) {
+                    document.getElementById('audition-form-ui').style.display = 'block';
+                    document.getElementById('audition-status-ui').style.display = 'none';
+                    return;
+                }
+                const d = doc.data();
+                const ui = document.getElementById('audition-status-ui');
+                document.getElementById('audition-form-ui').style.display = 'none';
+                ui.style.display = 'block';
+
+                if(d.status === 'pending') {
+                    ui.innerHTML = `<div class="status-msg" style="color:orange; border-color:orange;">PLEASE WAIT FOR RESULTS</div>`;
+                } else if(d.status === 'rejected') {
+                    ui.innerHTML = `<div class="status-msg" style="color:red; border-color:red;">REJECTED<br><small>${d.reason}</small><br><button class="btn" style="margin-top:10px;" onclick="resetAudition('${myId}')">I UNDERSTAND & RETRY</button></div>`;
+                } else if(d.status === 'accepted') {
+                    ui.innerHTML = `<div class="status-msg" style="color:var(--emerald); border-color:var(--emerald);">ACCEPTED! Check your Discord.</div>`;
+                }
+            });
+        }
+
+        async function resetAudition(id) {
+            await db.collection('auditions').doc(id).delete();
+            localStorage.removeItem('my_aud_id');
+            location.reload();
+        }
+
         async function loadAdminAuditions() {
+            const list = document.getElementById('admin-audition-list');
             db.collection('auditions').where('status', '==', 'pending').onSnapshot(snap => {
-                const list = document.getElementById('admin-auditions');
                 list.innerHTML = '';
                 snap.forEach(doc => {
                     const d = doc.data();
                     list.innerHTML += `
                         <div class="admin-card">
-                            <b>${d.name}</b> (${d.discord})
-                            <p>${d.exp}</p>
-                            <input type="text" id="rej-${doc.id}" placeholder="Reason if rejecting">
-                            <button class="btn" style="width:48%; background:green;" onclick="updateAudStatus('${doc.id}', 'accepted')">Accept</button>
-                            <button class="btn" style="width:48%; background:red;" onclick="updateAudStatus('${doc.id}', 'rejected')">Reject</button>
+                            <b>${d.name}</b> (${d.discord})<br><p>${d.exp}</p>
+                            <input type="text" id="rej-reason-${doc.id}" placeholder="Reason if rejecting...">
+                            <button class="btn" style="width:48%; background:green;" onclick="updateStat('${doc.id}', 'accepted')">Accept</button>
+                            <button class="btn" style="width:48%; background:red;" onclick="updateStat('${doc.id}', 'rejected')">Reject</button>
                         </div>`;
                 });
             });
         }
 
-        async function updateAudStatus(id, stat) {
-            const reason = document.getElementById('rej-'+id).value;
-            await db.collection('auditions').doc(id).update({ status: stat, reason: reason });
+        async function updateStat(id, status) {
+            const reason = document.getElementById('rej-reason-'+id).value;
+            await db.collection('auditions').doc(id).update({ status, reason });
         }
 
-        // --- LOGIN ---
-        function handleLogin() {
-            const user = prompt("Username:");
-            if(user === "virtual2025") {
-                localStorage.setItem('wicked_user', 'admin');
-                location.reload();
+        // Live Background
+        db.collection('settings').doc('theme').onSnapshot(doc => {
+            if(doc.exists() && doc.data().background) {
+                document.getElementById('main-body').style.background = `linear-gradient(rgba(0,0,0,0.5), rgba(0,0,0,0.5)), url('${doc.data().background}') no-repeat center center fixed`;
+                document.getElementById('main-body').style.backgroundSize = 'cover';
             }
-        }
-        if(userSession === 'admin') {
-            document.getElementById('admin-nav').style.display = 'block';
-            loadAdminAuditions();
-        }
-        if(localStorage.getItem('my_audition_id')) monitorStatus(localStorage.getItem('my_audition_id'));
+        });
 
+        loadCalendar();
+        loadNews();
+        checkAuditionStatus();
     </script>
 </body>
 </html>
