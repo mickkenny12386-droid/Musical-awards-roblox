@@ -5,125 +5,173 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Moulin Rouge! | The Spectacular Musical</title>
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@700&family=Montserrat:wght@300;400;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@700&family=Playfair+Display:ital,wght@1,700&family=Montserrat:wght@300;400;700&display=swap" rel="stylesheet">
     <style>
-        :root { --rouge: #e60000; --gold: #d4af37; --bg: #0a0a0a; --card: #151515; }
-        body { background: var(--bg); color: white; font-family: 'Montserrat', sans-serif; margin: 0; }
-        
+        :root { 
+            --rouge-dark: #4a0404; 
+            --rouge-bright: #bc0000; 
+            --gold: #d4af37; 
+            --gold-bright: #f9e29b;
+            --black: #0a0a0a; 
+        }
+
+        body { 
+            background: radial-gradient(circle, var(--rouge-dark) 0%, var(--black) 100%);
+            color: white; 
+            font-family: 'Montserrat', sans-serif; 
+            margin: 0;
+            min-height: 100vh;
+        }
+
         /* Navigatie */
         nav { 
             display: flex; justify-content: space-between; align-items: center; 
-            padding: 15px 40px; background: #000; border-bottom: 2px solid var(--gold);
+            padding: 20px 50px; background: rgba(0,0,0,0.9); border-bottom: 2px solid var(--gold);
             position: sticky; top: 0; z-index: 1000;
         }
-        .nav-right { display: flex; align-items: center; gap: 20px; }
-        .nav-right a, .lang-btn { color: white; text-decoration: none; font-weight: bold; cursor: pointer; text-transform: uppercase; font-size: 0.9rem; }
-        .nav-right a:hover { color: var(--gold); }
+        .logo { font-family: 'Cinzel Decorative'; color: var(--gold); font-size: 1.8rem; letter-spacing: 2px; }
+        .nav-links a { color: white; text-decoration: none; margin-left: 25px; font-weight: bold; cursor: pointer; transition: 0.3s; }
+        .nav-links a:hover { color: var(--gold); }
 
         /* Secties */
-        section { padding: 60px 10%; display: none; }
+        section { padding: 60px 10%; display: none; animation: fadeIn 0.8s ease-in-out; }
         .active { display: block; }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+
+        .glow-title { 
+            font-family: 'Cinzel Decorative'; color: var(--gold-bright); 
+            text-shadow: 0 0 20px var(--rouge-bright); text-align: center; font-size: 3.5rem;
+        }
+
+        /* Kalender */
+        .calendar-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 10px; margin-top: 30px; }
+        .day { 
+            background: rgba(0,0,0,0.6); border: 1px solid var(--rouge-dark); 
+            min-height: 120px; padding: 10px; transition: 0.3s; cursor: pointer;
+        }
+        .day:hover { border-color: var(--gold); background: rgba(74, 4, 4, 0.4); }
+        .day-num { font-weight: bold; color: var(--gold); font-size: 1.2rem; }
+        .has-show { background: linear-gradient(to bottom, rgba(188,0,0,0.3), rgba(0,0,0,0.8)) !important; }
+
+        /* Ticket Overlay */
+        #ticket-overlay {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.95); z-index: 2000; display: none;
+            justify-content: center; align-items: center;
+        }
+        .ticket-window {
+            background: var(--rouge-dark); border: 3px solid var(--gold);
+            padding: 40px; border-radius: 15px; max-width: 650px; width: 90%;
+            text-align: center; box-shadow: 0 0 50px #000;
+        }
+        .tier-box {
+            display: flex; justify-content: space-between; align-items: center;
+            background: rgba(0,0,0,0.5); padding: 15px; margin: 10px 0; border: 1px solid var(--gold);
+            border-radius: 8px;
+        }
+        .tier-name { font-weight: bold; color: var(--gold-bright); text-align: left; }
+        .tier-price { color: #00ff00; }
+        .sold-out { color: var(--rouge-bright); font-weight: bold; text-transform: uppercase; }
+
+        /* Dashboard */
+        .admin-card { background: rgba(0,0,0,0.8); border: 2px solid var(--gold); padding: 30px; margin-bottom: 20px; }
+        .delete-btn { background: none; color: var(--rouge-bright); border: none; cursor: pointer; font-weight: bold; }
         
-        .glow-title { font-family: 'Cinzel Decorative'; color: #ffcc33; text-shadow: 0 0 15px var(--rouge); text-align: center; font-size: 3rem; }
+        input, select, textarea { 
+            width: 100%; padding: 12px; margin: 10px 0; background: #1a1a1a; 
+            border: 1px solid var(--gold); color: white; border-radius: 5px;
+        }
+        .btn-rouge { 
+            background: var(--rouge-bright); color: white; border: none; 
+            padding: 15px 30px; font-weight: bold; cursor: pointer; text-transform: uppercase;
+        }
 
         /* Info Kaarten */
-        #info-container { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px; margin-top: 30px; }
-        .info-card { background: var(--card); border: 1px solid #333; padding: 15px; border-radius: 8px; }
-        .info-card img { width: 100%; border-radius: 4px; margin-bottom: 10px; }
-
-        /* Tickets & Agenda */
-        .calendar-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 5px; background: #222; padding: 5px; }
-        .day { background: var(--bg); min-height: 100px; padding: 5px; border: 1px solid #333; }
-        .ticket-btn { background: var(--rouge); color: white; border: none; padding: 5px; cursor: pointer; font-size: 0.7rem; width: 100%; margin-top: 5px; }
-        .ticket-btn:disabled { background: #444; cursor: not-allowed; }
-
-        /* Dashboard & Forms */
-        .admin-box { background: var(--card); padding: 30px; border: 1px solid var(--gold); margin-top: 20px; }
-        input, select, textarea { width: 100%; padding: 10px; margin: 10px 0; background: #222; border: 1px solid #444; color: white; }
-        .btn-gold { background: var(--gold); color: black; border: none; padding: 10px 20px; font-weight: bold; cursor: pointer; }
-        
-        table { width: 100%; border-collapse: collapse; margin-top: 20px; }
-        th, td { border: 1px solid #333; padding: 10px; text-align: left; }
+        .info-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 25px; }
+        .info-card { background: rgba(0,0,0,0.7); border: 1px solid var(--gold); overflow: hidden; }
+        .info-card img { width: 100%; height: 180px; object-fit: cover; }
+        .info-card-content { padding: 15px; }
     </style>
 </head>
 <body>
 
 <nav>
-    <div style="font-family: 'Cinzel Decorative'; color: var(--gold); font-size: 1.2rem;">MOULIN ROUGE!</div>
-    <div class="nav-right">
+    <div class="logo">MOULIN ROUGE!</div>
+    <div class="nav-links">
         <a onclick="showSection('home')">Home</a>
         <a onclick="showSection('casting')">Casting</a>
         <a onclick="showSection('tickets')">Tickets</a>
-        <a onclick="checkLogin()">Club (Dashboard)</a>
-        <div class="lang-btn" onclick="toggleLang()">🌐 <span id="lang-label">NL</span></div>
+        <a onclick="checkLogin()">Club</a>
+        <a onclick="toggleLang()" id="lang-btn">EN</a>
     </div>
 </nav>
 
 <section id="home" class="active">
     <h1 class="glow-title">WELCOME TO THE ROUGE</h1>
-    <div id="info-container">
+    <div class="info-grid" id="home-content">
         </div>
 </section>
 
 <section id="casting">
     <h1 class="glow-title">AUDITIONS</h1>
-    <div class="admin-box" style="max-width: 500px; margin: 0 auto;">
+    <div class="admin-card" style="max-width: 500px; margin: 0 auto;">
         <input type="text" id="cast-discord" placeholder="Discord Name">
         <input type="text" id="cast-roblox" placeholder="Roblox Name">
-        <select id="cast-role-select">
-            <option>Christian</option>
-            <option>Satine</option>
-            <option>Harold Zidler</option>
-            <option>The Duke</option>
-            <option>Ensemble</option>
+        <select id="cast-role">
+            <option>Christian</option><option>Satine</option><option>Zidler</option><option>The Duke</option>
         </select>
-        <p>Present at rehearsals?</p>
-        <select id="cast-present">
-            <option value="Yes">Yes</option>
-            <option value="No">No</option>
-        </select>
-        <button class="btn-gold" onclick="submitAudition()">SUBMIT APPLICATION</button>
+        <p>Rehearsal presence?</p>
+        <select id="cast-reh"><option>Yes</option><option>No</option></select>
+        <button class="btn-rouge" onclick="applyCast()">Submit Audition</button>
     </div>
 </section>
 
 <section id="tickets">
     <h1 class="glow-title">APRIL 2026</h1>
-    <div class="calendar-grid" id="calendar-grid"></div>
+    <div class="calendar-grid" id="calendar"></div>
 </section>
 
+<div id="ticket-overlay">
+    <div class="ticket-window">
+        <h2 id="show-title" style="font-family: 'Cinzel Decorative'; color: var(--gold);">DATE</h2>
+        <div id="tiers-container"></div>
+        <button class="btn-rouge" style="background: #333; margin-top: 20px;" onclick="closeTickets()">Back</button>
+    </div>
+</div>
+
 <section id="dashboard">
-    <h1 class="glow-title">ADMIN CLUB</h1>
-    <div class="admin-box">
-        <h3>Manage Content</h3>
-        <input type="text" id="info-title" placeholder="Title">
-        <input type="text" id="info-img" placeholder="Image URL (bijv. https://...)">
-        <textarea id="info-text" placeholder="Description"></textarea>
-        <button class="btn-gold" onclick="addInfoCard()">ADD TO HOME</button>
-        
-        <hr style="margin: 30px 0; border: 0.5px solid #444;">
-        
-        <h3>Manage Shows</h3>
-        <input type="number" id="show-day" placeholder="Day in April">
-        <button class="btn-gold" onclick="addShow()">CREATE SHOW</button>
-
-        <hr style="margin: 30px 0; border: 0.5px solid #444;">
-
-        <h3>Auditions Received</h3>
-        <table>
-            <thead><tr><th>Discord</th><th>Roblox</th><th>Role</th><th>Present</th></tr></thead>
-            <tbody id="audition-list"></tbody>
-        </table>
+    <h1 class="glow-title">ADMIN PANEL</h1>
+    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+        <div class="admin-card">
+            <h3>Manage Info</h3>
+            <input type="text" id="info-title" placeholder="Title">
+            <input type="text" id="info-img" placeholder="Image URL">
+            <textarea id="info-text" placeholder="Description"></textarea>
+            <button class="btn-rouge" onclick="addInfo()">Post to Home</button>
+            <div id="admin-info-list" style="margin-top:20px;"></div>
+        </div>
+        <div class="admin-card">
+            <h3>Manage Shows</h3>
+            <input type="number" id="show-day" placeholder="Day (1-30)">
+            <input type="number" id="cancan-price" placeholder="Can-Can Price (Robux)" value="10">
+            <button class="btn-rouge" onclick="createShow()">Add Show</button>
+            <div id="admin-show-list" style="margin-top:20px;"></div>
+        </div>
+    </div>
+    <div class="admin-card">
+        <h3>Applications</h3>
+        <div id="audition-list"></div>
     </div>
 </section>
 
 <script>
-    // Data Storage (Normaal gebruik je Firebase, dit is voor nu lokaal)
-    let infoCards = [];
-    let auditions = [];
+    let isAdmin = false;
     let shows = {}; 
+    let auditions = [];
+    let homeCards = [];
+    let userTickets = 0;
 
-    // Stoelen configuratie
-    const CAPACITY = { cancan: 24, rang1: 76, diamond: 260, bohemian: 96 };
+    const CAP = { cancan: 24, rang1: 76, diamond: 260, bohemian: 96 };
 
     function showSection(id) {
         document.querySelectorAll('section').forEach(s => s.classList.remove('active'));
@@ -131,117 +179,127 @@
     }
 
     function checkLogin() {
-        let pass = prompt("Enter Club Password:");
-        if (pass === "Virtual2025!") {
+        let p = prompt("Enter Password:");
+        if (p === "Virtual2025!") {
+            isAdmin = true;
             showSection('dashboard');
+            renderAdmin();
         } else {
-            alert("Wrong Password!");
+            alert("Wrong password!");
         }
     }
 
-    // HOME FUNCTIES
-    function addInfoCard() {
-        const card = {
-            id: Date.now(),
-            title: document.getElementById('info-title').value,
-            img: document.getElementById('info-img').value,
-            text: document.getElementById('info-text').value
-        };
-        infoCards.push(card);
+    // --- HOME FUNCTIES ---
+    function addInfo() {
+        if(!isAdmin) return;
+        homeCards.push({ id: Date.now(), title: document.getElementById('info-title').value, img: document.getElementById('info-img').value, text: document.getElementById('info-text').value });
         renderHome();
+        renderAdmin();
+    }
+
+    function deleteInfo(id) {
+        if(!isAdmin) return;
+        homeCards = homeCards.filter(c => c.id !== id);
+        renderHome();
+        renderAdmin();
     }
 
     function renderHome() {
-        const container = document.getElementById('info-container');
-        container.innerHTML = infoCards.map(c => `
+        document.getElementById('home-content').innerHTML = homeCards.map(c => `
             <div class="info-card">
-                <img src="${c.img || 'https://via.placeholder.com/300x150'}" alt="info">
-                <h3>${c.title}</h3>
-                <p>${c.text}</p>
-                <button onclick="deleteInfo(${c.id})" style="background:none; color:red; border:none; cursor:pointer;">[Verwijderen]</button>
+                <img src="${c.img || 'https://via.placeholder.com/300'}" alt="img">
+                <div class="info-card-content">
+                    <h3>${c.title}</h3>
+                    <p>${c.text}</p>
+                </div>
             </div>
         `).join('');
     }
 
-    function deleteInfo(id) {
-        infoCards = infoCards.filter(c => c.id !== id);
-        renderHome();
-    }
-
-    // CASTING FUNCTIES
-    function submitAudition() {
-        const auditie = {
-            discord: document.getElementById('cast-discord').value,
-            roblox: document.getElementById('cast-roblox').value,
-            role: document.getElementById('cast-role-select').value,
-            present: document.getElementById('cast-present').value
-        };
-        auditions.push(auditie);
-        alert("Audition sent!");
-        renderAuditions();
-    }
-
-    function renderAuditions() {
-        const list = document.getElementById('audition-list');
-        list.innerHTML = auditions.map(a => `
-            <tr><td>${a.discord}</td><td>${a.roblox}</td><td>${a.role}</td><td>${a.present}</td></tr>
-        `).join('');
-    }
-
-    // TICKET FUNCTIES
-    function initCalendar() {
-        const grid = document.getElementById('calendar-grid');
-        grid.innerHTML = '';
-        for (let i = 1; i <= 30; i++) {
-            grid.innerHTML += `<div class="day" id="day-${i}"><small>${i}</small><div id="shows-${i}"></div></div>`;
-        }
-    }
-
-    function addShow() {
+    // --- TICKET FUNCTIES ---
+    function createShow() {
         const day = document.getElementById('show-day').value;
-        if (!day || day < 1 || day > 30) return;
-        
-        if (!shows[day]) {
-            shows[day] = { cancan: 0, rang1: 0, diamond: 0, bohemian: 0 };
-        }
-        renderTickets();
+        const price = document.getElementById('cancan-price').value;
+        shows[day] = { price: price, sold: { cancan: 0, rang1: 0, diamond: 0, bohemian: 0 } };
+        renderCalendar();
+        renderAdmin();
     }
 
-    function buyTicket(day, type) {
-        if (shows[day][type] < CAPACITY[type]) {
-            shows[day][type]++;
-            confetti({ particleCount: 100, spread: 70, origin: { y: 0.6 } });
-            alert(`Ticket bought for ${type}!`);
-            renderTickets();
+    function renderCalendar() {
+        const cal = document.getElementById('calendar');
+        cal.innerHTML = '';
+        for(let i=1; i<=30; i++) {
+            let hasShow = shows[i] ? 'has-show' : '';
+            cal.innerHTML += `<div class="day ${hasShow}" onclick="openTickets(${i})">
+                <span class="day-num">${i}</span>
+                ${shows[i] ? '<br><small>SHOW LIVE</small>' : ''}
+            </div>`;
         }
     }
 
-    function renderTickets() {
-        for (let day in shows) {
-            const container = document.getElementById(`shows-${day}`);
-            const s = shows[day];
-            container.innerHTML = `
-                <button class="ticket-btn" onclick="buyTicket(${day}, 'cancan')" ${s.cancan >= CAPACITY.cancan ? 'disabled' : ''}>
-                    Can-Can (${CAPACITY.cancan - s.cancan} left)
-                </button>
-                <button class="ticket-btn" onclick="buyTicket(${day}, 'rang1')" ${s.rang1 >= CAPACITY.rang1 ? 'disabled' : ''}>
-                    Rang 1 (${CAPACITY.rang1 - s.rang1} left)
-                </button>
-            `;
-            if (s.cancan >= CAPACITY.cancan && s.rang1 >= CAPACITY.rang1) {
-                container.innerHTML += `<div style="color:red; font-size:0.6rem; font-weight:bold;">SOLD OUT</div>`;
-            }
-        }
+    function openTickets(day) {
+        if(!shows[day]) return;
+        const s = shows[day];
+        document.getElementById('show-title').innerText = `SHOW: APRIL ${day}, 2026`;
+        document.getElementById('tiers-container').innerHTML = `
+            ${renderTier(day, 'Can-Can Seats', 'cancan', s.price)}
+            ${renderTier(day, 'Rang 1', 'rang1', 'FREE')}
+            ${renderTier(day, 'Diamond (Rang 2)', 'diamond', 'FREE')}
+            ${renderTier(day, 'Bohemians (Rang 3)', 'bohemian', 'FREE')}
+        `;
+        document.getElementById('ticket-overlay').style.display = 'flex';
+    }
+
+    function renderTier(day, name, key, price) {
+        const left = CAP[key] - shows[day].sold[key];
+        if(left <= 0) return `<div class="tier-box"><div class="tier-name">${name}</div><div class="sold-out">SOLD OUT</div></div>`;
+        return `
+            <div class="tier-box">
+                <div class="tier-name">${name}<br><small>${left} seats left</small></div>
+                <div class="tier-price">${price === 'FREE' ? 'FREE' : price + ' R$'}</div>
+                <button class="btn-rouge" onclick="buyTicket(${day}, '${key}')">SELECT</button>
+            </div>
+        `;
+    }
+
+    function buyTicket(day, key) {
+        if(userTickets >= 5) { alert("Max 5 tickets per person!"); return; }
+        shows[day].sold[key]++;
+        userTickets++;
+        confetti({ particleCount: 150, spread: 70, origin: { y: 0.6 }, colors: ['#d4af37', '#bc0000'] });
+        alert("Ticket added to your network!");
+        openTickets(day);
+    }
+
+    function closeTickets() { document.getElementById('ticket-overlay').style.display = 'none'; }
+
+    // --- ADMIN / CASTING ---
+    function applyCast() {
+        auditions.push({ disc: document.getElementById('cast-discord').value, rob: document.getElementById('cast-roblox').value, role: document.getElementById('cast-role').value, reh: document.getElementById('cast-reh').value });
+        alert("Application sent!");
+    }
+
+    function renderAdmin() {
+        if(!isAdmin) return;
+        document.getElementById('admin-info-list').innerHTML = homeCards.map(c => `<div>${c.title} <button class="delete-btn" onclick="deleteInfo(${c.id})">[X]</button></div>`).join('');
+        document.getElementById('admin-show-list').innerHTML = Object.keys(shows).map(d => `<div>Day ${d} <button class="delete-btn" onclick="deleteShow(${d})">[X]</button></div>`).join('');
+        document.getElementById('audition-list').innerHTML = auditions.map(a => `<div style="border-bottom:1px solid #333; padding:5px;">${a.disc} (${a.rob}) - ${a.role} - Reh: ${a.reh}</div>`).join('');
+    }
+
+    function deleteShow(day) {
+        if(!isAdmin) return;
+        delete shows[day];
+        renderCalendar();
+        renderAdmin();
     }
 
     function toggleLang() {
-        const lbl = document.getElementById('lang-label');
-        lbl.innerText = lbl.innerText === 'NL' ? 'EN' : 'NL';
+        let b = document.getElementById('lang-btn');
+        b.innerText = b.innerText === 'EN' ? 'NL' : 'EN';
         confetti({ particleCount: 50 });
-        // Hier kun je tekstvertalingen toevoegen zoals in de vorige code
     }
 
-    initCalendar();
+    renderCalendar();
 </script>
 </body>
 </html>
